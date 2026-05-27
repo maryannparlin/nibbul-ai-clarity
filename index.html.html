@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Clarity: From Overwhelm to Ownership</title>
+<style>
+  :root {
+    --teal: #00A896;
+    --teal-light: #00C5B0;
+    --dark: #1A1A2E;
+    --cream: #F0FAFA;
+    --white: #FFFFFF;
+    --gray: #6B7280;
+    --light-gray: #F3F4F6;
+    --border: #E5E7EB;
+    --green: #059669;
+    --amber: #D97706;
+    --blue: #1D4ED8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #F9FAFB; color: var(--dark); }
+
+  /* HEADER */
+  .course-header { background: var(--dark); color: white; padding: 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; }
+  .header-brand { font-size: 13px; font-weight: 700; letter-spacing: 2px; color: var(--teal-light); text-transform: uppercase; }
+  .header-title { font-size: 14px; color: #CCCCCC; }
+  .progress-bar-wrap { height: 4px; background: rgba(255,255,255,0.15); }
+  .progress-bar { height: 4px; background: var(--teal); transition: width 0.4s ease; }
+
+  /* LAYOUT */
+  .course-layout { display: flex; min-height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar { width: 260px; flex-shrink: 0; background: var(--white); border-right: 1px solid var(--border); padding: 20px 0; position: sticky; top: 69px; height: calc(100vh - 69px); overflow-y: auto; }
+  .sidebar-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: var(--gray); text-transform: uppercase; padding: 0 20px 12px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 20px; cursor: pointer; transition: background 0.15s; border-left: 3px solid transparent; font-size: 13px; color: var(--gray); }
+  .nav-item:hover { background: var(--cream); color: var(--teal); }
+  .nav-item.active { background: var(--cream); color: var(--teal); border-left-color: var(--teal); font-weight: 600; }
+  .nav-item.completed .nav-dot { background: var(--green) !important; }
+  .nav-item.completed { color: #374151; }
+  .nav-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--light-gray); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; color: var(--gray); border: 2px solid var(--border); }
+  .nav-item.active .nav-dot { background: var(--teal); color: white; border-color: var(--teal); }
+  .nav-item.completed .nav-dot { color: white; border-color: var(--green); }
+  .nav-check { display: none; }
+  .nav-item.completed .nav-check { display: inline; }
+  .nav-item.completed .nav-num { display: none; }
+
+  /* MAIN */
+  .main { flex: 1; padding: 0; }
+  .slide { display: none; }
+  .slide.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* HERO */
+  .slide-hero { background: var(--dark); color: white; padding: 60px 48px 48px; position: relative; overflow: hidden; }
+  .slide-hero::before { content: attr(data-num); position: absolute; right: -20px; top: -30px; font-size: 200px; font-weight: 900; color: white; opacity: 0.04; line-height: 1; pointer-events: none; }
+  .hero-step-label { font-size: 11px; font-weight: 700; letter-spacing: 3px; color: var(--teal-light); text-transform: uppercase; margin-bottom: 12px; }
+  .hero-title { font-size: 42px; font-weight: 900; line-height: 1.15; margin-bottom: 16px; }
+  .hero-sub { font-size: 16px; color: #AAAAAA; margin-bottom: 24px; }
+  .hero-time { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--teal-light); background: rgba(0,168,150,0.15); padding: 6px 14px; border-radius: 20px; }
+
+  /* CONTENT */
+  .slide-content { padding: 40px 48px; max-width: 860px; }
+  .content-section { margin-bottom: 32px; }
+  .section-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: var(--teal); text-transform: uppercase; margin-bottom: 12px; }
+  .lead-text { font-size: 18px; line-height: 1.7; color: #374151; margin-bottom: 20px; }
+  .body-text { font-size: 15px; line-height: 1.75; color: #4B5563; margin-bottom: 14px; }
+
+  /* STEP LIST */
+  .step-list { list-style: none; counter-reset: steps; }
+  .step-list li { counter-increment: steps; display: flex; gap: 14px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .step-list li:last-child { border-bottom: none; }
+  .step-list li::before { content: counter(steps); width: 28px; height: 28px; border-radius: 50%; background: var(--teal); color: white; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .step-list li span { font-size: 15px; line-height: 1.6; color: #374151; }
+  .step-list li strong { color: var(--dark); }
+
+  /* CARDS */
+  .card-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .card.why { border-left: 4px solid var(--teal); }
+  .card.tip { border-left: 4px solid var(--amber); }
+  .card.warning { border-left: 4px solid #EF4444; }
+  .card-title { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+  .card.why .card-title { color: var(--teal); }
+  .card.tip .card-title { color: var(--amber); }
+  .card.warning .card-title { color: #EF4444; }
+  .card p { font-size: 14px; line-height: 1.65; color: #374151; }
+
+  /* QUOTE BLOCK */
+  .quote-block { background: #0D1B2A; border-left: 4px solid var(--teal); border-radius: 0 12px 12px 0; padding: 24px 28px; margin: 20px 0; }
+  .quote-block p { font-size: 18px; line-height: 1.7; color: var(--teal-light); font-style: italic; margin-bottom: 10px; }
+  .quote-block .attribution { font-size: 13px; color: #888888; }
+
+  /* TRY BOX */
+  .try-box { background: var(--cream); border: 1px solid #A7E8E2; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+  .try-box .try-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--teal); text-transform: uppercase; margin-bottom: 10px; }
+  .try-box p { font-size: 15px; color: #374151; line-height: 1.65; }
+
+  /* THREE-COL FRAMEWORK */
+  .framework-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .framework-card { border-radius: 12px; padding: 24px 20px; text-align: center; }
+  .framework-card .pct { font-size: 52px; font-weight: 900; color: white; line-height: 1; margin-bottom: 6px; }
+  .framework-card .lbl { font-size: 14px; font-weight: 700; color: white; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+  .framework-card .desc { font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.6; }
+
+  /* TABS */
+  .tabs-wrap { margin-bottom: 24px; }
+  .tab-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 0; }
+  .tab-btn { padding: 8px 16px; border-radius: 8px 8px 0 0; border: 1px solid var(--border); border-bottom: none; background: var(--light-gray); font-size: 13px; font-weight: 600; color: var(--gray); cursor: pointer; transition: all 0.15s; }
+  .tab-btn.active { background: white; color: var(--teal); border-color: var(--teal); border-bottom: 1px solid white; }
+  .tab-panel { display: none; background: white; border: 1px solid var(--border); border-radius: 0 12px 12px 12px; padding: 24px; }
+  .tab-panel.active { display: block; animation: fadeIn 0.2s ease; }
+  .tab-panel .tab-title { font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+  .tab-panel .bad { background: #FEF2F2; border-left: 3px solid #EF4444; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 14px; color: #374151; }
+  .tab-panel .good { background: var(--cream); border-left: 3px solid var(--teal); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 14px; color: #374151; }
+  .tab-panel .tab-tip { font-size: 13px; color: var(--amber); font-style: italic; margin-top: 10px; }
+
+  /* PROMPT TEMPLATE */
+  .prompt-box { background: #1E2337; color: #E2E8F0; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.8; padding: 20px 24px; border-radius: 10px; margin: 16px 0; position: relative; }
+  .prompt-label { position: absolute; top: 10px; right: 14px; font-size: 10px; color: #64748B; letter-spacing: 1px; text-transform: uppercase; }
+  .prompt-highlight { color: #00C5B0; }
+
+  /* DIMENSIONS GRID */
+  .dim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .dim-card { background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .dim-header { padding: 10px 16px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: white; }
+  .dim-body { padding: 16px; }
+  .dim-body .def { font-size: 14px; font-weight: 600; color: var(--dark); margin-bottom: 6px; }
+  .dim-body .ex { font-size: 13px; color: var(--gray); }
+
+  /* POWER MOVE CARDS */
+  .power-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .power-card { background: #0D1B2A; border-radius: 12px; overflow: hidden; }
+  .power-top { padding: 16px; font-size: 13px; font-weight: 700; color: white; text-transform: uppercase; letter-spacing: 1px; }
+  .power-body { padding: 16px; font-size: 14px; color: #CCCCCC; line-height: 1.65; }
+
+  /* NAV BUTTONS */
+  .slide-nav { display: flex; justify-content: space-between; align-items: center; padding: 24px 48px 40px; border-top: 1px solid var(--border); }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; }
+  .btn-prev { background: var(--light-gray); color: #374151; }
+  .btn-prev:hover { background: var(--border); }
+  .btn-next { background: var(--teal); color: white; }
+  .btn-next:hover { background: #008A7A; }
+  .btn:disabled { opacity: 0.4; cursor: default; }
+  .slide-counter { font-size: 13px; color: var(--gray); }
+
+  /* MARK DONE */
+  .mark-done-wrap { text-align: center; margin-bottom: 20px; }
+  .btn-done { background: white; color: var(--green); border: 2px solid var(--green); padding: 10px 28px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .btn-done:hover { background: var(--green); color: white; }
+  .btn-done.done-active { background: var(--green); color: white; }
+
+  /* INTRO SLIDE */
+  .intro-hero { background: var(--dark); padding: 60px 48px; }
+  .intro-hero h1 { font-size: 48px; font-weight: 900; color: white; line-height: 1.1; margin-bottom: 16px; }
+  .intro-hero .tagline { font-size: 20px; color: var(--teal-light); margin-bottom: 32px; }
+  .intro-stats { display: flex; gap: 24px; }
+  .stat-pill { background: rgba(255,255,255,0.08); border-radius: 8px; padding: 12px 20px; }
+  .stat-pill .num { font-size: 24px; font-weight: 900; color: var(--teal-light); }
+  .stat-pill .lbl { font-size: 12px; color: #AAAAAA; }
+
+  /* OUTRO */
+  .outro-hero { background: var(--teal); padding: 60px 48px; position: relative; overflow: hidden; }
+  .outro-hero::before { content: "✓"; position: absolute; right: -10px; top: -20px; font-size: 220px; color: white; opacity: 0.08; pointer-events: none; }
+  .outro-hero h2 { font-size: 38px; font-weight: 900; color: white; margin-bottom: 12px; }
+  .outro-hero p { font-size: 17px; color: rgba(255,255,255,0.85); line-height: 1.7; }
+  .checklist { list-style: none; }
+  .checklist li { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 15px; color: #374151; }
+  .checklist li:last-child { border-bottom: none; }
+  .check-icon { width: 22px; height: 22px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: white; font-size: 11px; font-weight: 700; margin-top: 1px; }
+
+  /* REFLECTION INPUT */
+  .reflect-box { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+  .reflect-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--teal); text-transform: uppercase; margin-bottom: 12px; }
+  .reflect-box textarea { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-size: 14px; font-family: 'Segoe UI', Arial, sans-serif; color: #374151; resize: vertical; min-height: 80px; outline: none; }
+  .reflect-box textarea:focus { border-color: var(--teal); }
+
+  @media (max-width: 700px) {
+    .sidebar { display: none; }
+    .slide-hero { padding: 40px 24px 32px; }
+    .slide-content { padding: 24px; }
+    .hero-title { font-size: 30px; }
+    .card-row { grid-template-columns: 1fr; }
+    .framework-row { grid-template-columns: 1fr; }
+    .dim-grid { grid-template-columns: 1fr; }
+    .power-row { grid-template-columns: 1fr; }
+    .slide-nav { padding: 20px 24px 32px; }
+    .intro-stats { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<header class="course-header">
+  <div class="header-inner">
+    <div class="header-brand">NIBBUL Microlearning</div>
+    <div class="header-title">AI Clarity: From Overwhelm to Ownership</div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar" id="progress-bar" style="width:10%"></div>
+  </div>
+</header>
+
+<div class="course-layout">
+  <nav class="sidebar">
+    <div class="sidebar-label">Course Lessons</div>
+    <div class="nav-item active" onclick="goTo(0)" id="nav-0">
+      <div class="nav-dot"><span class="nav-num">★</span><span class="nav-check">✓</span></div>
+      <span>Introduction</span>
+    </div>
+    <div class="nav-item" onclick="goTo(1)" id="nav-1">
+      <div class="nav-dot"><span class="nav-num">1</span><span class="nav-check">✓</span></div>
+      <span>Signal vs. Noise</span>
+    </div>
+    <div class="nav-item" onclick="goTo(2)" id="nav-2">
+      <div class="nav-dot"><span class="nav-num">2</span><span class="nav-check">✓</span></div>
+      <span>The Pre-AI Pause</span>
+    </div>
+    <div class="nav-item" onclick="goTo(3)" id="nav-3">
+      <div class="nav-dot"><span class="nav-num">3</span><span class="nav-check">✓</span></div>
+      <span>Your Voice Guide</span>
+    </div>
+    <div class="nav-item" onclick="goTo(4)" id="nav-4">
+      <div class="nav-dot"><span class="nav-num">4</span><span class="nav-check">✓</span></div>
+      <span>Prompting That Works</span>
+    </div>
+    <div class="nav-item" onclick="goTo(5)" id="nav-5">
+      <div class="nav-dot"><span class="nav-num">5</span><span class="nav-check">✓</span></div>
+      <span>The 10-80-10 Loop</span>
+    </div>
+    <div class="nav-item" onclick="goTo(6)" id="nav-6">
+      <div class="nav-dot"><span class="nav-num">★</span><span class="nav-check">✓</span></div>
+      <span>You're Done!</span>
+    </div>
+  </nav>
+
+  <main class="main">
+
+    <!-- SLIDE 0: INTRO -->
+    <div class="slide active" id="slide-0">
+      <div class="intro-hero">
+        <div style="font-size:11px;font-weight:700;letter-spacing:3px;color:var(--teal-light);text-transform:uppercase;margin-bottom:14px;">NIBBUL Microlearning · Welcome</div>
+        <h1>AI Clarity:<br>From Overwhelm<br>to Ownership</h1>
+        <div class="tagline">Stop chasing tools. Start leading with intent.</div>
+        <div class="intro-stats">
+          <div class="stat-pill"><div class="num">5</div><div class="lbl">Lessons</div></div>
+          <div class="stat-pill"><div class="num">~45</div><div class="lbl">Minutes total</div></div>
+          <div class="stat-pill"><div class="num">0</div><div class="lbl">Tech skills needed</div></div>
+        </div>
+      </div>
+      <div class="slide-content">
+        <div class="content-section">
+          <div class="section-label">What this course is about</div>
+          <p class="lead-text">You've seen the headlines. The flood of tools. The pressure to keep up. And you've probably felt it — that low-grade anxiety that says everyone else has figured this out. Why haven't I?</p>
+          <p class="body-text">Here's the truth: you're not behind. You've just been navigating without a clear signal. Most AI training teaches you tools. This course teaches you something more important: <strong>clarity</strong>. Because when your thinking is clear, your AI output is clear. When your thinking is chaotic, AI amplifies your chaos.</p>
+          <p class="body-text">After 5 lessons, you'll have a personal clarity framework, a voice style guide, and a prompting system that actually sounds like you.</p>
+        </div>
+        <div class="card-row">
+          <div class="card" style="border-left:4px solid var(--teal);">
+            <div class="card-title" style="color:var(--teal);">Who this is for</div>
+            <p>Professionals, entrepreneurs, and team leaders who are overwhelmed by AI hype and want a clear, human-centered approach that actually works.</p>
+          </div>
+          <div class="card" style="border-left:4px solid var(--green);">
+            <div class="card-title" style="color:var(--green);">What you'll build</div>
+            <p>A 3-question clarity framework, a personal Voice Style Guide, and a structured prompting system — all in under an hour.</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-nav">
+        <button class="btn btn-prev" disabled>← Back</button>
+        <span class="slide-counter">Lesson 1 of 7</span>
+        <button class="btn btn-next" onclick="goTo(1)">Lesson 1: Signal vs. Noise →</button>
+      </div>
+    </div>
+
+    <!-- SLIDE 1: SIGNAL VS. NOISE -->
+    <div class="slide" id="slide-1">
+      <div class="slide-hero" data-num="01">
+        <div class="hero-step-label">Lesson 1 of 5</div>
+        <div class="hero-title">Signal vs. Noise:<br>Choosing Clarity</div>
+        <div class="hero-sub">The single mindset shift that changes everything about how you use AI.</div>
+        <div class="hero-time">⏱ Approx. 8 minutes</div>
+      </div>
+      <div class="slide-content">
+
+        <div class="content-section">
+          <div class="section-label">Meet Marcus</div>
+          <p class="body-text">Marcus is a marketing director at a tech company. He has 12 AI tools open. He added a 13th one last Tuesday. Three different AI writing assistants sit in his browser — one for social, one for email, one for "everything else." None sound like him. His content is inconsistent. His team is confused. He's spending more time managing AI than thinking.</p>
+          <p class="body-text">What is Marcus missing? It's not another tool. It's a clear signal before the tool is opened.</p>
+        </div>
+
+        <div class="content-section">
+          <div class="section-label">The core principle</div>
+          <p class="lead-text">AI is not intelligent. It's a prediction engine. It takes everything humanity has ever written and predicts what word comes next based on the pattern of what you gave it.</p>
+          <div class="quote-block">
+            <p>"AI amplifies you. It doesn't replace you. If your thinking is clear, your output will be clear. If your thinking is chaotic, AI will amplify your chaos."</p>
+            <div class="attribution">— Dr. Eric Goodman, AI Clarity Challenge</div>
+          </div>
+          <p class="body-text">This is the <strong>coherence principle</strong>: your mental state, your intent, and the quality of your thinking directly shape the quality of what comes out. Most people ask "which tool should I use?" The better question — the one that changes everything — is: <strong>what am I actually trying to do?</strong></p>
+        </div>
+
+        <div class="content-section">
+          <div class="section-label">The 3 orientation questions</div>
+          <p class="body-text">Before you open any AI tool, ask yourself these three questions:</p>
+          <ol class="step-list">
+            <li><span><strong>What problem am I actually trying to solve?</strong> Not "what do I want to create" — what is the real decision or challenge?</span></li>
+            <li><span><strong>How can AI specifically help me achieve this goal?</strong> Not "how do I use AI" — how does it serve THIS specific goal?</span></li>
+            <li><span><strong>How does this align with my values and strengths?</strong> What part of this can only I — as a human — do?</span></li>
+          </ol>
+        </div>
+
+        <div class="content-section">
+          <div class="section-label">The 10-80-10 framework</div>
+          <div class="framework-row">
+            <div class="framework-card" style="background:var(--teal);">
+              <div class="pct">10%</div>
+              <div class="lbl">You</div>
+              <div class="desc">Vision. Intent. Your 3 questions. This is your job. No one else can do it.</div>
+            </div>
+            <div class="framework-card" style="background:#1E3A2E;">
+              <div class="pct">80%</div>
+              <div class="lbl">AI</div>
+              <div class="desc">Heavy lifting. Writing, structuring, researching, drafting. Let it work.</div>
+            </div>
+            <div class="framework-card" style="background:#D97706;">
+              <div class="pct">10%</div>
+              <div class="lbl">You Again</div>
+              <div class="desc">Human review. Fact-check. Refine. Does this sound like me? Own the output.</div>
+            </div>
+          </div>
+          <p class="body-text">Most people skip the first 10%. That's why the output never matches their intent.</p>
+        </div>
+
+        <div class="card-row">
+          <div class="card why">
+            <div class="card-title">Why this matters</div>
+            <p>Research shows that when teams adopt AI with clarity-first practices, they see up to 60% less decision fatigue, 3x faster tool adoption, and 80% higher confidence. The tool doesn't change — the approach does.</p>
+          </div>
+          <div class="card tip">
+            <div class="card-title">This week's action</div>
+            <p>Before your next AI interaction, write down your 3 answers on a sticky note. Just try it once. Notice what's different about the output you get.</p>
+          </div>
+        </div>
+
+        <div class="mark-done-wrap">
+          <button class="btn-done" id="done-1" onclick="markDone(1)">Mark Lesson 1 Complete ✓</button>
+        </div>
+      </div>
+      <div class="slide-nav">
+        <button class="btn btn-prev" onclick="goTo(0)">← Back</button>
+        <span class="slide-counter">Lesson 2 of 7</span>
+        <button class="btn btn-next" onclick="goTo(2)">Lesson 2 →</button>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: THE PRE-AI PAUSE -->
+    <div class="slide" id="slide-2">
+      <div class="slide-hero" data-num="02">
+        <div class="hero-step-label">Lesson 2 of 5</div>
+        <div class="hero-title">The Pre-AI Pause</div>
+        <div class="hero-sub">3 questions. 1 breath. Everything changes.</div>
+        <div class="hero-time">⏱ Approx. 8 minutes</div>
+      </div>
+      <div class="slide-content">
+
+        <div class="content-section">
+          <div class="section-label">Marcus, 4 weeks later</div>
+          <p class="body-text">Marcus did something different today. Before opening any tool, he took a breath. A real one — not the kind you take while already typing. He picked up a sticky note and wrote three things: the decision he was actually making, the outcome he was responsible for, and his role in the process.</p>
+          <p class="body-text">Then he opened one tool. His content manager read the result and said: <em>"This finally sounds like you."</em></p>
+          <p class="body-text">What changed wasn't the tool. What changed was what Marcus brought to it.</p>
+        </div>
+
+        <div class="content-section">
+          <div class="section-label">The pause practice — step by step</div>
+          <ol class="step-list">
+            <li><span><strong>Take 2 slow breaths.</strong> Breathe in fully. Exhale completely. Your nervous system resets. Your thinking clears. This isn't soft science — tension shows up in every word you type.</span></li>
+            <li><span><strong>Q1: What decision am I actually making?</strong> Not "what content do I need." What is the real choice? The more specific, the better your output.</span></li>
+            <li><span><strong>Q2: What is the outcome I am responsible for?</strong> The why behind the task. Not "I need a social post." Why? What should happen because of it?</span></li>
+            <li><span><strong>Q3: What is MY role here?</strong> What part can only a human — specifically you — do? AI can write. It cannot have your values, your relationships, or your accountability.</span></li>
+          </ol>
+        </div>
+
+        <div class="try-box">
+          <div class="try-label">Try it right now</div>
+          <p>Think of an AI task you have coming up this week. Write your 3-question answers in the space below. You'll use them in Lesson 4 when you build your first structured prompt.</p>
+        </div>
+
+        <div class="reflect-box">
+          <div class="reflect-label">Your 3 answers</div>
+          <textarea placeholder="Q1 — What decision am I actually making?&#10;&#10;Q2 — What outcome am I responsible for?&#10;&#10;Q3 — What is my specific role in this?"></textarea>
+        </div>
+
+        <div class="card-row">
+          <div class="card why">
+            <div class="card-title">Why the breath matters</div>
+            <p>When you're stressed, your body is in fight-or-flight mode. Your thinking narrows. Your prompts get vague. That state shows up in your output. You wouldn't send an important email mid-panic attack. Don't prompt in one either.</p>
+          </div>
+          <div class="card tip">
+            <div class="card-title">Pro tip</div>
+            <p>Set a "10-second pause rule": before every AI session, write your 3 answers before typing a single prompt. People who do this consistently report fewer revisions and much less AI frustration overall.</p>
+          </div>
+        </div>
+
+        <div class="mark-done-wrap">
+          <button class="btn-done" id="done-2" onclick="markDone(2)">Mark Lesson 2 Complete ✓</button>
+        </div>
+      </div>
+      <div class="slide-nav">
+        <button class="btn btn-prev" onclick="goTo(1)">← Back</button>
+        <span class="slide-counter">Lesson 3 of 7</span>
+        <button class="btn btn-next" onclick="goTo(3)">Lesson 3 →</button>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: VOICE GUIDE -->
+    <div class="slide" id="slide-3">
+      <div class="slide-hero" data-num="03">
+        <div class="hero-step-label">Lesson 3 of 5</div>
+        <div class="hero-title">Your Voice Is<br>Your Superpower</div>
+        <div class="hero-sub">Stop sounding like a robot. Start sounding like you.</div>
+        <div class="hero-time">⏱ Approx. 10 minutes</div>
+      </div>
+      <div class="slide-content">
+
+        <div class="content-section">
+          <div class="section-label">The problem: AI drift</div>
+          <p class="lead-text">You write a prompt. You get output. It's technically correct. But it doesn't sound like you. It sounds like it was written by a very confident robot who read everything on the internet.</p>
+          <p class="body-text">This is called <strong>AI drift</strong> — and it happens when AI doesn't know who it's speaking as. Most frustration with AI isn't about the tool. The tool is plenty smart. The problem is <em>identity</em>. AI doesn't know who you are unless you tell it.</p>
+        </div>
+
+        <div class="content-section">
+          <div class="section-label">The 4 dimensions of your voice</div>
+          <div class="dim-grid">
+            <div class="dim-card">
+              <div class="dim-header" style="background:var(--teal);">VOICE</div>
+              <div class="dim-body">
+                <div class="def">How you sound on the page</div>
+                <div class="ex">Formal or conversational? Complex sentences or short punchy ones? Industry jargon or plain talk? This is your sonic fingerprint.</div>
+              </div>
+            </div>
+            <div class="dim-card">
+              <div class="dim-header" style="background:#1E3A5F;">TONE</div>
+              <div class="dim-body">
+                <div class="def">Your attitude toward topics</div>
+                <div class="ex">Curious? Assertive? Warm? Skeptical? Tone is the emotional layer underneath the words. It's what makes someone feel like they're reading a specific person.</div>
+              </div>
+            </div>
+            <div class="dim-card">
+              <div class="dim-header" style="background:#4A2D0D;">STYLE</div>
+              <div class="dim-body">
+                <div class="def">Your signature language patterns</div>
+                <div class="ex">Metaphors? Opening with questions? "Here's the thing..." Do you tend to lead with data or with story? Those patterns are your style.</div>
+              </div>
+            </div>
+            <div class="dim-card">
+              <div class="dim-header" style="background:#2D0D4A;">STRUCTURE</div>
+              <div class="dim-body">
+                <div class="def">How you architect ideas</div>
+                <div class="ex">Do you build to a conclusion or lead with the punchline? End with a call to action or an open question? Structure is how you frame and deliver ideas.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-section">
+          <div class="section-label">Build your voice style guide — 4 steps</div>
+          <ol class="step-list">
+            <li><span><strong>Gather 2–3 writing samples.</strong> Emails, blog posts, social posts — anything you've actually written. Even a few paragraphs work. The more representative, the better.</span></li>
+            <li><span><strong>Paste this analysis prompt</strong> into your AI tool of choice along with your samples.</span></li>
+            <li><span><strong>Review the output.</strong> Read it back: does it sound like you? Adjust anything that's off. When you read it and think <em>"yes, that's me,"</em> it's ready.</span></li>
+            <li><span><strong>Save your Voice Style Guide.</strong> Copy it into a note or your AI's memory. From now on, every important prompt starts with it.</span></li>
+          </ol>
+        </div>
+
+        <div class="section-label">Your voice analysis prompt — copy this</div>
+        <div class="prompt-box">
+          <div class="prompt-label">PASTE INTO AI</div>
+          <span class="prompt-highlight">Analyze</span> the writing samples below and identify my:<br>
+          1. <span class="prompt-highlight">Voice</span> — how I sound (formal/casual, complex/plain)<br>
+          2. <span class="prompt-highlight">Tone</span> — my attitude toward topics (curious, assertive, warm, etc.)<br>
+          3. <span class="prompt-highlight">Style</span> — signature patterns, metaphors, opening phrases<br>
+          4. <span class="prompt-highlight">Structure</span> — how I organize and deliver ideas<br><br>
+          Then create a <span class="prompt-highlight">Voice Style Guide</span> I can paste into future prompts<br>
+          so AI outputs sound like me, not like generic AI.<br><br>
+          [paste your writing samples here]
+        </div>
+
+        <div class="card-row">
+          <div class="card why">
+            <div class="card-title">Why this is the most valuable thing you'll build</div>
+            <p>Once you have your Voice Style Guide, you paste it at the top of every important prompt. Your output immediately stops sounding generic and starts sounding like you wrote it — because it knows who you are.</p>
+          </div>
+          <div class="card tip">
+            <div class="card-title">Pro tip</div>
+            <p>Don't have much writing yet? Use a voice recording. Transcribe a few minutes of yourself talking through a work problem. AI will analyze your spoken patterns just as well as written ones.</p>
+          </div>
+        </div>
+
+        <div class="mark-done-wrap">
+          <button class="btn-done" id="done-3" onclick="markDone(3)">Mark Lesson 3 Complete ✓</button>
+        </div>
+      </div>
+      <div class="slide-nav">
+        <button class="btn btn-prev" onclick="goTo(2)">← Back</button>
+        <span class="slide-counter">Lesson 4 of 7</span>
+        <button class="btn btn-next" onclick="goTo(4)">Lesson 4 →</button>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: PROMPTING -->
+    <div class="slide" id="slide-4">
+      <div class="slide-hero" data-num="04">
+        <div class="hero-step-label">Lesson 4 of 5</div>
+        <div class="hero-title">Prompting That<br>Actually Works</div>
+        <div class="hero-sub">9 principles. One framework. Results that sound like you.</div>
+        <div class="hero-time">⏱ Approx. 10 minutes</div>
+      </div>
+      <div class="slide-content">
+
+        <div class="content-section">
+          <div class="section-label">The difference one prompt makes</div>
+          <div class="card-row">
+            <div class="card warning">
+              <div class="card-title">Weak prompt</div>
+              <p><em>"Write a marketing email for our product launch."</em><br><br>Missing: role, context, audience, length, format, voice, constraints. Result: generic noise.</p>
+            </div>
+            <div class="card why">
+              <div class="card-title">Strong prompt</div>
+              <p><em>"Act as head of marketing for a B2B SaaS company. Write a 200-word launch email for HR managers at companies with 50–200 employees. Warm but direct tone. No exclamation points. Use the voice guide below."</em></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-section">
+          <div class="section-label">The 9 principles — click each to expand</div>
+          <div class="tabs-wrap">
+            <div class="tab-buttons">
+              <button class="tab-btn active" onclick="switchTab(this,'tab-p1')">1</button>
+              <button class="tab-btn" onclick="switchTab(this,'tab-p2')">2</button>
+              <button class="tab-btn" onclick="switchTab(this,'tab-p3')">3</button>
+              <button class="tab-btn" onclick="switchTab(this,'tab-p4')">4</button>
+              <button class="tab-btn" onclick="switchTab(this,'tab-p5')">5</button>
+              <button class="tab-btn" onclick="switchTab(this,'tab-p6')">6</button>
+              <button class="tab-btn" onclick="switchTab(this,'tab-p7')">7</button>
+              <button class="tab-btn" onclick="switchTab(this,'tab-p8')">8</button>
+              <button class="tab-btn" onclick="switchTab(this,'tab-p9')">9</button>
+            </div>
+            <div class="tab-panel active" id="tab-p1">
+              <div class="tab-title">Talk Like a Human</div>
+              <p style="font-size:14px;color:#4B5563;margin-bottom:10px;">You don't need formal command language. Conversational context gets better results.</p>
+              <div class="bad">❌ "Compose a professional business development correspondence."</div>
+              <div class="good">✅ "I need to pitch to investors next week. What's the most compelling way to present our growth metrics?"</div>
+              <div class="tab-tip">Tip: If you'd say it to a smart colleague over coffee, you can say it to AI.</div>
+            </div>
+            <div class="tab-panel" id="tab-p2">
+              <div class="tab-title">Be Direct</div>
+              <p style="font-size:14px;color:#4B5563;margin-bottom:10px;">Vague requests produce vague results. Tell AI exactly what you want.</p>
+              <div class="bad">❌ "Help me with marketing."</div>
+              <div class="good">✅ "Write a 3-email drip sequence for inbound leads who haven't booked a call in 14 days."</div>
+              <div class="tab-tip">Tip: If you can't be direct, you don't know what you want yet — use the Pre-AI Pause first.</div>
+            </div>
+            <div class="tab-panel" id="tab-p3">
+              <div class="tab-title">Give Context</div>
+              <p style="font-size:14px;color:#4B5563;margin-bottom:10px;">Who are you? What's the situation? What are the stakes? The more AI knows, the better it performs.</p>
+              <div class="bad">❌ "Write a product description."</div>
+              <div class="good">✅ "I'm the CEO of a startup. Our product helps solo consultants automate client onboarding. Target buyer: overworked solopreneurs who hate admin."</div>
+              <div class="tab-tip">Tip: Context is the job brief. No brief = guesswork. Good brief = great output.</div>
+            </div>
+            <div class="tab-panel" id="tab-p4">
+              <div class="tab-title">Specify the Output</div>
+              <p style="font-size:14px;color:#4B5563;margin-bottom:10px;">Table? Email? Bullet list? 200 words? Under 150 characters? Tell it the exact format — always.</p>
+              <div class="bad">❌ "Give me some ideas." (How many? What format? How long?)</div>
+              <div class="good">✅ "Give me 5 subject line options. Under 50 characters each. Curious, not salesy."</div>
+              <div class="tab-tip">Tip: If a form has a character limit, tell AI that limit. It will honor it.</div>
+            </div>
+            <div class="tab-panel" id="tab-p5">
+              <div class="tab-title">Share Examples</div>
+              <p style="font-size:14px;color:#4B5563;margin-bottom:10px;">Show AI what "good" looks like before you ask for it. Examples calibrate the output instantly.</p>
+              <div class="bad">❌ "Write an email in my style." (What's your style?)</div>
+              <div class="good">✅ "Here's an email I sent last week that I love. Match this tone and rhythm: [paste example]"</div>
+              <div class="tab-tip">Tip: One good example is worth 10 adjectives trying to describe what you want.</div>
+            </div>
+            <div class="tab-panel" id="tab-p6">
+              <div class="tab-title">Iterate — Push for Better</div>
+              <p style="font-size:14px;color:#4B5563;margin-bottom:10px;">Never accept the first output. Always push back. AI responds to challenge.</p>
+              <div class="bad">❌ Getting output, thinking "good enough," and moving on.</div>
+              <div class="good">✅ "That's a 7. What would you change to make it a 10?" or "That's mediocre. What's missing? Try again."</div>
+              <div class="tab-tip">Tip: Rate responses 1–10 and ask AI to improve its own score. The jump from 7 to 10 is usually significant.</div>
+            </div>
+            <div class="tab-panel" id="tab-p7">
+              <div class="tab-title">Use Branching</div>
+              <p style="font-size:14px;color:#4B5563;margin-bottom:10px;">When you want to try a different direction, don't start over. Go back up the thread and branch — try a new path without losing your work.</p>
+              <div class="bad">❌ Starting a brand new conversation every time you want to explore a different angle.</div>
+              <div class="good">✅ Going back up the chat to an earlier point and clicking "edit" to try a completely different direction from that moment.</div>
+              <div class="tab-tip">Tip: Think of your conversation like a tree. You can climb back up and grow a different branch anytime.</div>
+            </div>
+            <div class="tab-panel" id="tab-p8">
+              <div class="tab-title">Chunk It</div>
+              <p style="font-size:14px;color:#4B5563;margin-bottom:10px;">Big projects need stages. Don't ask AI to write a complete business plan in one prompt. Break it down.</p>
+              <div class="bad">❌ "Write me a complete go-to-market plan for my product launch."</div>
+              <div class="good">✅ Step 1: Research. → Step 2: Structure. → Step 3: Key sections one at a time.</div>
+              <div class="tab-tip">Tip: AI is like a brilliant assistant — give it one clear task at a time and it excels. Pile everything in and it overwhelms.</div>
+            </div>
+            <div class="tab-panel" id="tab-p9">
+              <div class="tab-title">Attach Your Voice Guide ← Most Important</div>
+              <p style="font-size:14px;color:#4B5563;margin-bottom:10px;">For any output that goes into the world with your name on it, start with your Voice Style Guide. Every time. No exceptions.</p>
+              <div class="bad">❌ "Write me a LinkedIn post about AI trends."</div>
+              <div class="good">✅ "Using the following Voice Style Guide: [your guide]. Write me a LinkedIn post about AI trends. 150 words. End with a question."</div>
+              <div class="tab-tip">Tip: This is the single step that separates generic AI content from content people recognize as genuinely yours.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-section">
+          <div class="section-label">Your structured prompt template</div>
+          <div class="prompt-box">
+            <div class="prompt-label">TEMPLATE</div>
+            <span class="prompt-highlight">ROLE:</span> Act as [expert role relevant to this task]<br>
+            <span class="prompt-highlight">CONTEXT:</span> I am [who you are]. The situation is [brief context]. The goal is [specific outcome].<br>
+            <span class="prompt-highlight">TASK:</span> [Exactly what you want — be direct]<br>
+            <span class="prompt-highlight">OUTPUT:</span> [Format: email / list / table / paragraphs]. [Length: X words / X items]. [Constraints: no jargon / no bullet points / etc.]<br>
+            <span class="prompt-highlight">VOICE:</span> [Paste your Voice Style Guide here]
+          </div>
+        </div>
+
+        <div class="card-row">
+          <div class="card why">
+            <div class="card-title">Why structure beats creativity</div>
+            <p>A creative prompt without structure gets creative-but-wrong results. A structured prompt tells AI exactly what to do and who to be. The output is predictably good — not just occasionally good.</p>
+          </div>
+          <div class="card tip">
+            <div class="card-title">Start with 3</div>
+            <p>Don't try to apply all 9 principles at once. Start with: Be Direct, Give Context, and Attach Your Voice Guide. Those three alone will transform your outputs immediately.</p>
+          </div>
+        </div>
+
+        <div class="mark-done-wrap">
+          <button class="btn-done" id="done-4" onclick="markDone(4)">Mark Lesson 4 Complete ✓</button>
+        </div>
+      </div>
+      <div class="slide-nav">
+        <button class="btn btn-prev" onclick="goTo(3)">← Back</button>
+        <span class="slide-counter">Lesson 5 of 7</span>
+        <button class="btn btn-next" onclick="goTo(5)">Lesson 5 →</button>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: 10-80-10 LOOP -->
+    <div class="slide" id="slide-5">
+      <div class="slide-hero" data-num="05">
+        <div class="hero-step-label">Lesson 5 of 5</div>
+        <div class="hero-title">The 10-80-10 Loop:<br>Iterate Like a Pro</div>
+        <div class="hero-sub">Bring it all together. Own the output.</div>
+        <div class="hero-time">⏱ Approx. 9 minutes</div>
+      </div>
+      <div class="slide-content">
+
+        <div class="content-section">
+          <div class="section-label">The complete workflow</div>
+          <ol class="step-list">
+            <li><span><strong>Pause.</strong> Breath + 3 questions. Know your intent before you open anything.</span></li>
+            <li><span><strong>Attach your Voice Style Guide.</strong> Every important prompt, every time.</span></li>
+            <li><span><strong>Write a structured prompt.</strong> Role + Context + Task + Output format + Constraints + Voice guide.</span></li>
+            <li><span><strong>Review and challenge.</strong> When output arrives, ask: "What assumptions did you make?" Fix any that are wrong before you build on them.</span></li>
+            <li><span><strong>Iterate.</strong> "That's a 7. What would make it a 10?" Keep pushing until it's right.</span></li>
+            <li><span><strong>Final human review.</strong> The last 10%. You look at this with your eyes, your judgment, your values. Verify facts. Make sure it sounds like you. You own the output.</span></li>
+          </ol>
+        </div>
+
+        <div class="content-section">
+          <div class="section-label">3 power moves most people never use</div>
+          <div class="power-row">
+            <div class="power-card">
+              <div class="power-top" style="background:var(--teal);">01 — Ask for Assumptions</div>
+              <div class="power-body">After getting any important output, say: <em>"List the assumptions you made to produce this."</em> At least one will be wrong. Fix it before building on a faulty foundation.</div>
+            </div>
+            <div class="power-card">
+              <div class="power-top" style="background:var(--amber);">02 — Improve Your Own Prompt</div>
+              <div class="power-body">Before submitting: <em>"How could this prompt be improved so you can give me better output?"</em> Let AI help you ask better questions. Then rewrite it.</div>
+            </div>
+            <div class="power-card">
+              <div class="power-top" style="background:#5A67D8;">03 — Let AI Interview You</div>
+              <div class="power-body"><em>"What 5 questions do you need answered from me to give a world-class response?"</em> Answer the questions. Then you'll have a great prompt without guessing.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-section">
+          <div class="section-label">Quick wins — pick 2 to do this week</div>
+          <div class="card-row">
+            <div class="card" style="border-left:4px solid var(--teal);">
+              <div class="card-title" style="color:var(--teal);">Win #1</div>
+              <p>Rewrite one email using a structured prompt and your Voice Style Guide. Compare it to the original. Notice the difference.</p>
+            </div>
+            <div class="card" style="border-left:4px solid var(--teal);">
+              <div class="card-title" style="color:var(--teal);">Win #2</div>
+              <p>Next AI output you get — ask it to list its assumptions. See what it says. Correct any that are wrong.</p>
+            </div>
+            <div class="card" style="border-left:4px solid var(--amber);">
+              <div class="card-title" style="color:var(--amber);">Win #3</div>
+              <p>Build your Voice Style Guide today using the prompt from Lesson 3. Save it somewhere accessible before you do anything else in AI.</p>
+            </div>
+            <div class="card" style="border-left:4px solid var(--amber);">
+              <div class="card-title" style="color:var(--amber);">Win #4</div>
+              <p>Run the Pre-AI Pause before every AI interaction this week — breath + 3 questions, every time. One week of this habit changes how you use AI permanently.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mark-done-wrap">
+          <button class="btn-done" id="done-5" onclick="markDone(5)">Mark Lesson 5 Complete ✓</button>
+        </div>
+      </div>
+      <div class="slide-nav">
+        <button class="btn btn-prev" onclick="goTo(4)">← Back</button>
+        <span class="slide-counter">Lesson 6 of 7</span>
+        <button class="btn btn-next" onclick="goTo(6)">Finish the Course →</button>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: OUTRO -->
+    <div class="slide" id="slide-6">
+      <div class="outro-hero">
+        <h2>You were never behind.</h2>
+        <p>You were navigating without a clear signal. Now you have one.</p>
+      </div>
+      <div class="slide-content">
+        <div class="content-section">
+          <div class="section-label">What you built in this course</div>
+          <ul class="checklist">
+            <li><div class="check-icon">✓</div><span>The <strong>Clarity Framework</strong> — 3 questions before every AI interaction</span></li>
+            <li><div class="check-icon">✓</div><span>The <strong>Pre-AI Pause</strong> — breath + intent = better output, every time</span></li>
+            <li><div class="check-icon">✓</div><span>The <strong>4 Dimensions of Voice</strong> — voice, tone, style, structure</span></li>
+            <li><div class="check-icon">✓</div><span>Your <strong>Voice Style Guide</strong> — the artifact that makes AI sound like you</span></li>
+            <li><div class="check-icon">✓</div><span>The <strong>9 Prompting Principles</strong> — structured prompts that produce real results</span></li>
+            <li><div class="check-icon">✓</div><span>The <strong>10-80-10 Loop</strong> — iterate, refine, and own every output</span></li>
+            <li><div class="check-icon">✓</div><span>3 <strong>Power Moves</strong> — ask for assumptions, improve your prompt, let AI interview you</span></li>
+          </ul>
+        </div>
+        <div class="content-section">
+          <div class="section-label">What's next</div>
+          <p class="lead-text">The tools will keep changing. New ones will come out every week. But the fundamentals you've built here don't change. Because they're not about AI. They're about you.</p>
+          <p class="body-text">Use AI. Lead with clarity. Let your future self thank you for starting here.</p>
+        </div>
+        <div style="background:var(--dark);border-radius:12px;padding:24px 28px;text-align:center;">
+          <div style="font-size:13px;font-weight:700;letter-spacing:2px;color:var(--teal-light);text-transform:uppercase;margin-bottom:8px;">NIBBUL Microlearning</div>
+          <div style="font-size:18px;color:white;font-weight:700;margin-bottom:6px;">More courses coming soon</div>
+          <div style="font-size:14px;color:#AAAAAA;">Stay tuned for the next course in the AI Clarity series.</div>
+        </div>
+      </div>
+      <div class="slide-nav">
+        <button class="btn btn-prev" onclick="goTo(5)">← Back</button>
+        <span class="slide-counter">Lesson 7 of 7</span>
+        <button class="btn btn-next" onclick="goTo(0)">↩ Restart Course</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  let current = 0;
+  const total = 7;
+  const completed = new Set();
+
+  function goTo(n) {
+    document.getElementById('slide-' + current).classList.remove('active');
+    document.getElementById('nav-' + current).classList.remove('active');
+    current = n;
+    document.getElementById('slide-' + current).classList.add('active');
+    document.getElementById('nav-' + current).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    updateProgress();
+  }
+
+  function markDone(n) {
+    completed.add(n);
+    const btn = document.getElementById('done-' + n);
+    btn.textContent = 'Lesson ' + n + ' Complete!';
+    btn.classList.add('done-active');
+    btn.disabled = true;
+    const navItem = document.getElementById('nav-' + n);
+    navItem.classList.add('completed');
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const visited = current + 1;
+    const pct = Math.round((Math.max(visited, completed.size + 1) / total) * 100);
+    document.getElementById('progress-bar').style.width = Math.min(pct, 100) + '%';
+  }
+
+  function switchTab(btn, panelId) {
+    const wrap = btn.closest('.tabs-wrap');
+    wrap.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    wrap.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(panelId).classList.add('active');
+  }
+
+  updateProgress();
+</script>
+</body>
+</html>
